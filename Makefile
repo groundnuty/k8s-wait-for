@@ -1,5 +1,5 @@
 TAG = $(shell git describe --tags --always)
-PREFIX = groundnuty
+PREFIX = $(shell git config --get remote.origin.url | rev | cut -d '/' -f 2 | rev)
 
 all: push
 
