@@ -1,8 +1,8 @@
-[![Latest Release](http://github-release-version.herokuapp.com/github/groundnuty/k8s-wait-for/release.svg)](https://github.com/groundnuty/k8s-wait-for/releases/latest)
-[![Build Status](https://travis-ci.org/groundnuty/k8s-wait-for.svg?branch=master)](https://travis-ci.org/groundnuty/k8s-wait-for)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9e61e311725b4015a24f294c591746b1)](https://www.codacy.com/app/groundnuty/k8s-wait-for?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=groundnuty/k8s-wait-for&amp;utm_campaign=Badge_Grade)
-[![Latest Docker Yag](https://images.microbadger.com/badges/version/groundnuty/k8s-wait-for.svg)](https://microbadger.com/images/groundnuty/k8s-wait-for "Get your own version badge on microbadger.com")
-[![Latest Docker Tag Details](https://images.microbadger.com/badges/image/groundnuty/k8s-wait-for.svg)](https://microbadger.com/images/groundnuty/k8s-wait-for "Get your own image badge on microbadger.com")
+[![Latest Release](http://github-release-version.herokuapp.com/github/onedata/k8s-wait-for/release.svg)](https://github.com/onedata/k8s-wait-for/releases/latest)
+[![Build Status](https://travis-ci.org/onedata/k8s-wait-for.svg?branch=master)](https://travis-ci.org/onedata/k8s-wait-for)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b008f8665fed427291a26d25c2fc9433)](https://www.codacy.com/app/groundnuty/k8s-wait-for_2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=onedata/k8s-wait-for&amp;utm_campaign=Badge_Grade)
+[![Latest Docker Yag](https://images.microbadger.com/badges/version/onedata/k8s-wait-for.svg)](https://microbadger.com/images/onedata/k8s-wait-for "Get your own version badge on microbadger.com")
+[![Latest Docker Tag Details](https://images.microbadger.com/badges/image/onedata/k8s-wait-for.svg)](https://microbadger.com/images/onedata/k8s-wait-for "Get your own image badge on microbadger.com")
 
 # k8s-wait-for
 
