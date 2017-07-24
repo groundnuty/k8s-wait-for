@@ -9,7 +9,6 @@ deploy:
 - provider: script
   script: make push
   on:
-    branch: master
     tags: true
 
 env:
