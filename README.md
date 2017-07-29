@@ -3,6 +3,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b008f8665fed427291a26d25c2fc9433)](https://www.codacy.com/app/groundnuty/k8s-wait-for_2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=onedata/k8s-wait-for&amp;utm_campaign=Badge_Grade)
 [![Latest Docker Yag](https://images.microbadger.com/badges/version/onedata/k8s-wait-for.svg)](https://microbadger.com/images/onedata/k8s-wait-for "Get your own version badge on microbadger.com")
 [![Latest Docker Tag Details](https://images.microbadger.com/badges/image/onedata/k8s-wait-for.svg)](https://microbadger.com/images/onedata/k8s-wait-for "Get your own image badge on microbadger.com")
+[![Docker Pulls](https://img.shields.io/docker/pulls/onedata/k8s-wait-for.svg)](https://hub.docker.com/r/onedata/k8s-wait-for/)
 
 # k8s-wait-for
 
