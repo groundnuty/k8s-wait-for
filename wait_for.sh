@@ -163,7 +163,7 @@ ready() {
 }
 
 main() {
-    if [ $# -eq 0 ]; then
+    if [ $# -lt 2 ]; then
         usage
     fi
 
