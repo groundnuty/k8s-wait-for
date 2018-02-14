@@ -8,7 +8,7 @@ trap "exit 1" TERM
 TOP_PID=$$
 
 KUBECTL_ARGS=""
-WIAT_TIME=2 # seconds
+WAIT_TIME=2 # seconds
 DEBUG=0
 
 usage() {
@@ -155,7 +155,7 @@ wait_for() {
     wait_for_resource="$1"
     wait_for_name="$2"
     echo "Waiting for $wait_for_resource $wait_for_name $KUBECTL_ARGS..."
-    sleep $WIAT_TIME
+    sleep $WAIT_TIME
 }
 
 ready() {
