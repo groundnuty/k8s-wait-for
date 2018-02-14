@@ -170,7 +170,7 @@ main() {
     main_name=""
     main_resouce=""
 
-    case $1 in
+    case "$1" in
         pod)
             main_resouce="pod"
             main_name="$2"
