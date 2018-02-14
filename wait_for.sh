@@ -8,8 +8,8 @@ trap "exit 1" TERM
 TOP_PID=$$
 
 KUBECTL_ARGS=""
-WAIT_TIME=2 # seconds
-DEBUG=0
+WAIT_TIME="${WAIT_TIME:-2}" # seconds
+DEBUG="${DEBUG:-0}"
 
 usage() {
 cat <<EOF
@@ -132,7 +132,7 @@ wait_for_resource() {
     wait_for_resource_descriptor="$2"
     while [ -n "$(get_${wait_for_resource_type}_state "$wait_for_resource_descriptor")" ] ; do
         echo "Waiting for $wait_for_resource_type $wait_for_resource_descriptor $KUBECTL_ARGS..."
-        sleep $WAIT_TIME
+        sleep "$WAIT_TIME"
     done
     ready $wait_for_resource_type "$wait_for_resource_descriptor"
 }
