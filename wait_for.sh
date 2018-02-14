@@ -168,25 +168,18 @@ main() {
     fi
 
     main_name=""
-    main_resouce=""
 
     case "$1" in
         pod)
             main_resouce="pod"
-            main_name="$2"
-            shift
             shift
             ;;
         service)
             main_resouce="service"
-            main_name="$2"
-            shift
             shift
             ;;
         job)
             main_resouce="job"
-            main_name="$2"
-            shift
             shift
             ;;
         *)
@@ -194,6 +187,9 @@ main() {
             exit 1
             ;;
     esac
+
+    main_name="$1"
+    shift
 
     KUBECTL_ARGS="${*}"
 
