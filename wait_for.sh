@@ -152,7 +152,7 @@ main() {
             shift
             ;;
         *)
-            printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+            printf 'ERROR: Unknown resource type: %s\n' "$1" >&2
             exit 1
             ;;
     esac
