@@ -127,39 +127,18 @@ get_job_state() {
     echo "$get_job_state_output2"
 }
 
-wait_for_service() {
-    wait_for_service_name="$1"
-    while [ "$(get_service_state "$wait_for_service_name")" != "" ] ; do
-        wait_for "service" "$wait_for_service_name"
+wait_for_resource() {
+    wait_for_resource_type=$1
+    wait_for_resource_descriptor="$2"
+    while [ -n "$(get_${wait_for_resource_type}_state "$wait_for_resource_descriptor")" ] ; do
+        echo "Waiting for $wait_for_resource_type $wait_for_resource_descriptor $KUBECTL_ARGS..."
+        sleep $WAIT_TIME
     done
-    ready "service" "$wait_for_service_name"
-}
-
-wait_for_pod() {
-    wait_for_pod_name="$1"
-    while [ "$(get_pod_state "$wait_for_pod_name")" != "" ] ; do
-        wait_for "pod" "$wait_for_pod_name"
-    done
-    ready "pod" "$wait_for_pod_name"
-}
-
-wait_for_job() {
-    wait_for_job_name="$1"
-    while [ "$(get_job_state "$wait_for_job_name")" != "" ] ; do
-        wait_for "job" "$wait_for_job_name"
-    done
-    ready "job" "$wait_for_job_name"
-}
-
-wait_for() {
-    wait_for_resource="$1"
-    wait_for_name="$2"
-    echo "Waiting for $wait_for_resource $wait_for_name $KUBECTL_ARGS..."
-    sleep $WAIT_TIME
+    ready $wait_for_resource_type "$wait_for_resource_descriptor"
 }
 
 ready() {
-    printf "%s %s %s is ready." "$1" "$2" "$KUBECTL_ARGS"
+    printf "%s %s %s is ready." $1 "$2" "$KUBECTL_ARGS"
 }
 
 main() {
@@ -167,19 +146,9 @@ main() {
         usage
     fi
 
-    main_name=""
-
     case "$1" in
-        pod)
-            main_resouce="pod"
-            shift
-            ;;
-        service)
-            main_resouce="service"
-            shift
-            ;;
-        job)
-            main_resouce="job"
+        pod|service|job)
+            main_resource=$1
             shift
             ;;
         *)
@@ -193,17 +162,7 @@ main() {
 
     KUBECTL_ARGS="${*}"
 
-    case $main_resouce in
-        pod)
-            wait_for_pod "$main_name"
-            ;;
-        job)
-            wait_for_job "$main_name"
-            ;;
-        service)
-            wait_for_service "$main_name"
-            ;;
-    esac
+    wait_for_resource $main_resource "$main_name"
 
     exit 0
 }
