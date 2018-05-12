@@ -3,6 +3,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9e61e311725b4015a24f294c591746b1)](https://www.codacy.com/app/groundnuty/k8s-wait-for?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=groundnuty/k8s-wait-for&amp;utm_campaign=Badge_Grade)
 [![Latest Docker Yag](https://images.microbadger.com/badges/version/groundnuty/k8s-wait-for.svg)](https://microbadger.com/images/groundnuty/k8s-wait-for "Get your own version badge on microbadger.com")
 [![Latest Docker Tag Details](https://images.microbadger.com/badges/image/groundnuty/k8s-wait-for.svg)](https://microbadger.com/images/groundnuty/k8s-wait-for "Get your own image badge on microbadger.com")
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fgroundnuty%2Fk8s-wait-for.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fgroundnuty%2Fk8s-wait-for?ref=badge_shield)
 
 # k8s-wait-for
 
@@ -274,3 +275,7 @@ develop-volume-s3-krakow-23786741-pdxtj                1/1       Running        
 develop-volume-s3-lisbon-3912793669-d4xh5              1/1       Running           0          59s
 develop-volume-s3-paris-124394749-qwt18                1/1       Running           0          57s
 ~~~
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fgroundnuty%2Fk8s-wait-for.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fgroundnuty%2Fk8s-wait-for?ref=badge_large)
