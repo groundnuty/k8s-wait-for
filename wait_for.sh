@@ -26,14 +26,9 @@ ${0##*/} pod -lapp=develop-volume-gluster-krakow
 Wait for all the pods in that job to have a 'Succeeded' state:
 ${0##*/} job develop-volume-s3-krakow-init
 
-Wait for all the pods in that job to have a 'Succeeded' state:
-${0##*/} job develop-volume-s3-krakow-init
-
 Wait for all selected pods to enter the 'Ready' state:
 ${0##*/} pod -l"release in (develop), chart notin (cross-support-job-3p)"
 
-Wait for all selected pods to enter the 'Ready' state:
-${0##*/} pod -l"release in (develop), chart notin (cross-support-job-3p)"
 EOF
 exit 1
 }
