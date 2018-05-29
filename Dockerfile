@@ -11,7 +11,7 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.docker.dockerfile="/Dockerfile"
 
-ENV KUBE_LATEST_VERSION="v1.6.4"
+ENV KUBE_LATEST_VERSION="v1.9.2"
 
 RUN apk add --update ca-certificates \
  && apk add --update -t deps curl\
