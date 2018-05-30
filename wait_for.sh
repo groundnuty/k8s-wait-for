@@ -138,14 +138,18 @@ wait_for_resource() {
     wait_for_resource_type=$1
     wait_for_resource_descriptor="$2"
     while [ -n "$(get_${wait_for_resource_type}_state "$wait_for_resource_descriptor")" ] ; do
-        echo "Waiting for $wait_for_resource_type $wait_for_resource_descriptor $KUBECTL_ARGS..."
+        print_KUBECTL_ARGS="$KUBECTL_ARGS"
+        [ "$print_KUBECTL_ARGS" != "" ] && print_KUBECTL_ARGS=" $print_KUBECTL_ARGS"
+        echo "Waiting for $wait_for_resource_type $wait_for_resource_descriptor${print_KUBECTL_ARGS}..."
         sleep "$WAIT_TIME"
     done
     ready "$wait_for_resource_type" "$wait_for_resource_descriptor"
 }
 
 ready() {
-    printf "[%s] %s %s %s is ready." "$(date +'%Y-%m-%d %H:%M:%S')\\n" "$1" "$2" "$KUBECTL_ARGS"
+    print_KUBECTL_ARGS="$KUBECTL_ARGS"
+    [ "$print_KUBECTL_ARGS" != "" ] && print_KUBECTL_ARGS=" $print_KUBECTL_ARGS"
+    printf "[%s] %s %s%s is ready.\\n" "$(date +'%Y-%m-%d %H:%M:%S')" "$1" "$2" "$print_KUBECTL_ARGS"
 }
 
 main() {
