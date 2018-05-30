@@ -6,7 +6,7 @@ script:
 - make container
 
 before_deploy:
-- docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+- docker login -u $DOCKER_USER -p $DOCKER_PASS
 
 deploy:
   # push taged container to docker hub
