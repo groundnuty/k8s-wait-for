@@ -8,8 +8,8 @@ trap "exit 1" TERM
 TOP_PID=$$
 
 KUBECTL_ARGS=""
-WIAT_TIME=2 # seconds
-DEBUG=0
+WAIT_TIME="${WAIT_TIME:-2}" # seconds
+DEBUG="${DEBUG:-0}"
 
 usage() {
 cat <<EOF
@@ -26,14 +26,9 @@ ${0##*/} pod -lapp=develop-volume-gluster-krakow
 Wait for all the pods in that job to have a 'Succeeded' state:
 ${0##*/} job develop-volume-s3-krakow-init
 
-Wait for all the pods in that job to have a 'Succeeded' state:
-${0##*/} job develop-volume-s3-krakow-init
-
 Wait for all selected pods to enter the 'Ready' state:
 ${0##*/} pod -l"release in (develop), chart notin (cross-support-job-3p)"
 
-Wait for all selected pods to enter the 'Ready' state:
-${0##*/} pod -l"release in (develop), chart notin (cross-support-job-3p)"
 EOF
 exit 1
 }
@@ -48,14 +43,26 @@ get_pod_state() {
     {{- range .items -}}
       {{- range .status.conditions -}}
         {{- if and (eq .type "Ready") (eq .status "False") -}}
-        {{ .status }}
+        {{- if .reason -}}
+          {{- if ne .reason "PodCompleted" -}}
+            {{ .status }}
+          {{- end -}}
+        {{- else -}}
+          {{ .status }}
+        {{- end -}}
         {{- end -}}
       {{- end -}}
     {{- end -}}
   {{- else -}}
     {{- range .status.conditions -}}
         {{- if and (eq .type "Ready") (eq .status "False") -}}
-        {{ .status }}
+        {{- if .reason -}}
+          {{- if ne .reason "PodCompleted" -}}
+            {{ .status }}
+          {{- end -}}
+        {{- else -}}
+          {{ .status }}
+        {{- end -}}
         {{- end -}}
     {{- end -}}
   {{- end -}}
@@ -127,87 +134,46 @@ get_job_state() {
     echo "$get_job_state_output2"
 }
 
-wait_for_service() {
-    wait_for_service_name="$1"
-    while [ "$(get_service_state "$wait_for_service_name")" != "" ] ; do
-        wait_for "service" "$wait_for_service_name"
+wait_for_resource() {
+    wait_for_resource_type=$1
+    wait_for_resource_descriptor="$2"
+    while [ -n "$(get_${wait_for_resource_type}_state "$wait_for_resource_descriptor")" ] ; do
+        print_KUBECTL_ARGS="$KUBECTL_ARGS"
+        [ "$print_KUBECTL_ARGS" != "" ] && print_KUBECTL_ARGS=" $print_KUBECTL_ARGS"
+        echo "Waiting for $wait_for_resource_type $wait_for_resource_descriptor${print_KUBECTL_ARGS}..."
+        sleep "$WAIT_TIME"
     done
-    ready "service" "$wait_for_service_name"
-}
-
-wait_for_pod() {
-    wait_for_pod_name="$1"
-    while [ "$(get_pod_state "$wait_for_pod_name")" != "" ] ; do
-        wait_for "pod" "$wait_for_pod_name"
-    done
-    ready "pod" "$wait_for_pod_name"
-}
-
-wait_for_job() {
-    wait_for_job_name="$1"
-    while [ "$(get_job_state "$wait_for_job_name")" != "" ] ; do
-        wait_for "job" "$wait_for_job_name"
-    done
-    ready "job" "$wait_for_job_name"
-}
-
-wait_for() {
-    wait_for_resource="$1"
-    wait_for_name="$2"
-    echo "Waiting for $wait_for_resource $wait_for_name $KUBECTL_ARGS..."
-    sleep $WIAT_TIME
+    ready "$wait_for_resource_type" "$wait_for_resource_descriptor"
 }
 
 ready() {
-    printf "%s %s %s is ready." "$1" "$2" "$KUBECTL_ARGS"
+    print_KUBECTL_ARGS="$KUBECTL_ARGS"
+    [ "$print_KUBECTL_ARGS" != "" ] && print_KUBECTL_ARGS=" $print_KUBECTL_ARGS"
+    printf "[%s] %s %s%s is ready.\\n" "$(date +'%Y-%m-%d %H:%M:%S')" "$1" "$2" "$print_KUBECTL_ARGS"
 }
 
 main() {
-    if [ $# -eq 0 ]; then
+    if [ $# -lt 2 ]; then
         usage
     fi
 
-    main_name=""
-    main_resouce=""
-
-    case $1 in
-        pod)
-            main_resouce="pod"
-            main_name="$2"
-            shift
-            shift
-            ;;
-        service)
-            main_resouce="service"
-            main_name="$2"
-            shift
-            shift
-            ;;
-        job)
-            main_resouce="job"
-            main_name="$2"
-            shift
+    case "$1" in
+        pod|service|job)
+            main_resource=$1
             shift
             ;;
         *)
-            printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+            printf 'ERROR: Unknown resource type: %s\n' "$1" >&2
             exit 1
             ;;
     esac
 
+    main_name="$1"
+    shift
+
     KUBECTL_ARGS="${*}"
 
-    case $main_resouce in
-        pod)
-            wait_for_pod "$main_name"
-            ;;
-        job)
-            wait_for_job "$main_name"
-            ;;
-        service)
-            wait_for_service "$main_name"
-            ;;
-    esac
+    wait_for_resource "$main_resource" "$main_name"
 
     exit 0
 }
