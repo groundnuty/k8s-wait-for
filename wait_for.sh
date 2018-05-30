@@ -48,14 +48,26 @@ get_pod_state() {
     {{- range .items -}}
       {{- range .status.conditions -}}
         {{- if and (eq .type "Ready") (eq .status "False") -}}
-        {{ .status }}
+        {{- if .reason -}}
+          {{- if ne .reason "PodCompleted" -}}
+            {{ .status }}
+          {{- end -}}
+        {{- else -}}
+          {{ .status }}
+        {{- end -}}
         {{- end -}}
       {{- end -}}
     {{- end -}}
   {{- else -}}
     {{- range .status.conditions -}}
         {{- if and (eq .type "Ready") (eq .status "False") -}}
-        {{ .status }}
+        {{- if .reason -}}
+          {{- if ne .reason "PodCompleted" -}}
+            {{ .status }}
+          {{- end -}}
+        {{- else -}}
+          {{ .status }}
+        {{- end -}}
         {{- end -}}
     {{- end -}}
   {{- end -}}
