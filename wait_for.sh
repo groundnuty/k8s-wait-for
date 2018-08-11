@@ -38,8 +38,8 @@ exit 1
 get_pod_state() {
     get_pod_state_name="$1"
     get_pod_state_flags="$2"
-    get_pod_state_output1=$(kubectl get pods "$get_pod_state_name" $get_pod_state_flags $KUBECTL_ARGS -o go-template='{{- if .items -}}
-  {{- if gt (len .items) 0}}
+    get_pod_state_output1=$(kubectl get pods "$get_pod_state_name" $get_pod_state_flags $KUBECTL_ARGS -o go-template='
+{{- if .items -}}
     {{- range .items -}}
       {{- range .status.conditions -}}
         {{- if and (eq .type "Ready") (eq .status "False") -}}
@@ -53,7 +53,7 @@ get_pod_state() {
         {{- end -}}
       {{- end -}}
     {{- end -}}
-  {{- else -}}
+{{- else -}}
     {{- range .status.conditions -}}
         {{- if and (eq .type "Ready") (eq .status "False") -}}
         {{- if .reason -}}
@@ -64,10 +64,9 @@ get_pod_state() {
           {{ .status }}
         {{- end -}}
         {{- end -}}
+    {{- else -}}
+      {{- printf "No resources found.\n" -}}
     {{- end -}}
-  {{- end -}}
-{{- else -}}
-  {{- printf "No resources found.\n" -}}
 {{- end -}}'  2>&1)
     if [ $? -ne 0 ]; then
         if expr match "$get_pod_state_output1" '\(.*not found$\)' 1>/dev/null ; then
