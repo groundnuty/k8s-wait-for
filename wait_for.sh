@@ -39,34 +39,27 @@ get_pod_state() {
     get_pod_state_name="$1"
     get_pod_state_flags="$2"
     get_pod_state_output1=$(kubectl get pods "$get_pod_state_name" $get_pod_state_flags $KUBECTL_ARGS -o go-template='
+{{- define "checkStatus" -}}
+  {{- range .status.conditions -}}
+      {{- if and (eq .type "Ready") (eq .status "False") -}}
+      {{- if .reason -}}
+        {{- if ne .reason "PodCompleted" -}}
+          {{ .status }}
+        {{- end -}}
+      {{- else -}}
+        {{ .status }}
+      {{- end -}}
+      {{- end -}}
+  {{- else -}}
+    {{- printf "No resources found.\n" -}}
+  {{- end -}}
+{{- end -}}
 {{- if .items -}}
     {{- range .items -}}
-      {{- range .status.conditions -}}
-        {{- if and (eq .type "Ready") (eq .status "False") -}}
-        {{- if .reason -}}
-          {{- if ne .reason "PodCompleted" -}}
-            {{ .status }}
-          {{- end -}}
-        {{- else -}}
-          {{ .status }}
-        {{- end -}}
-        {{- end -}}
-      {{- end -}}
+      {{ template "checkStatus" . }}
     {{- end -}}
 {{- else -}}
-    {{- range .status.conditions -}}
-        {{- if and (eq .type "Ready") (eq .status "False") -}}
-        {{- if .reason -}}
-          {{- if ne .reason "PodCompleted" -}}
-            {{ .status }}
-          {{- end -}}
-        {{- else -}}
-          {{ .status }}
-        {{- end -}}
-        {{- end -}}
-    {{- else -}}
-      {{- printf "No resources found.\n" -}}
-    {{- end -}}
+    {{ template "checkStatus" . }}
 {{- end -}}'  2>&1)
     if [ $? -ne 0 ]; then
         if expr match "$get_pod_state_output1" '\(.*not found$\)' 1>/dev/null ; then
