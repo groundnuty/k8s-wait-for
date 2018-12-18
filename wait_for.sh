@@ -49,6 +49,9 @@ get_pod_state() {
 {{- define "checkStatus" -}}
   {{- $rootStatus := .status }}
   {{- range .status.conditions -}}
+      {{- if and (eq .type "PodScheduled") (eq .status "False") -}}
+        {{ .status }}
+      {{- end -}}
       {{- if and (eq .type "Ready") (eq .status "False") -}}
       {{- if .reason -}}
         {{- if ne .reason "PodCompleted" -}}
