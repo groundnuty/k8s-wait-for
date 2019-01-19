@@ -40,6 +40,11 @@ EOF
 exit 1
 }
 
+# print messages with UTC timestamp prefix w/ millisec granularity
+msg() {
+    echo >&2 "$(date -u "+%F %T.%3N")" "$@"
+}
+
 # Job or set of pods is considered ready if all of the are ready
 # example output with 3 pods, where 2 are not ready would be: "false false"
 get_pod_state() {
@@ -76,7 +81,7 @@ get_pod_state() {
 {{- end -}}' 2>&1)
     if [ $? -ne 0 ]; then
         if expr match "$get_pod_state_output1" '\(.*not found$\)' 1>/dev/null ; then
-            echo "No pods found, waiting for them to be created..." >&2
+            msg "No pods found, waiting for them to be created..."
             echo "$get_pod_state_output1" >&2
         else
             echo "$get_pod_state_output1" >&2
@@ -127,7 +132,7 @@ get_job_state() {
         echo "$get_job_state_output" >&2
     fi
     if [ "$get_job_state_output" = "" ]; then
-        echo "wait_for.sh: No jobs found!" >&2
+        msg "wait_for.sh: No jobs found!"
         kill -s TERM $TOP_PID
     fi
     get_job_state_output1=$(printf "%s" "$get_job_state_output" | sed -nr 's#.*:[[:blank:]]+([[:digit:]]+) [[:alpha:]]+ / ([[:digit:]]+) [[:alpha:]]+ / ([[:digit:]]+) [[:alpha:]]+.*#\1:\2:\3#p' 2>&1)
@@ -170,7 +175,7 @@ wait_for_resource() {
     while [ -n "$(get_${wait_for_resource_type}_state "$wait_for_resource_descriptor")" ] ; do
         print_KUBECTL_ARGS="$KUBECTL_ARGS"
         [ "$print_KUBECTL_ARGS" != "" ] && print_KUBECTL_ARGS=" $print_KUBECTL_ARGS"
-        echo "Waiting for $wait_for_resource_type $wait_for_resource_descriptor${print_KUBECTL_ARGS}..."
+        msg "Waiting for $wait_for_resource_type $wait_for_resource_descriptor${print_KUBECTL_ARGS}..."
         sleep "$WAIT_TIME"
     done
     ready "$wait_for_resource_type" "$wait_for_resource_descriptor"
@@ -179,7 +184,7 @@ wait_for_resource() {
 ready() {
     print_KUBECTL_ARGS="$KUBECTL_ARGS"
     [ "$print_KUBECTL_ARGS" != "" ] && print_KUBECTL_ARGS=" $print_KUBECTL_ARGS"
-    printf "[%s] %s %s%s is ready.\\n" "$(date +'%Y-%m-%d %H:%M:%S')" "$1" "$2" "$print_KUBECTL_ARGS"
+    msg "$1 $2$print_KUBECTL_ARGS is ready."
 }
 
 main() {
@@ -198,7 +203,7 @@ main() {
             shift
             ;;
         *)
-            printf 'ERROR: Unknown resource type: %s\n' "$1" >&2
+            msg "ERROR: Unknown resource type: $1"
             exit 1
             ;;
     esac
