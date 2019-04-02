@@ -50,27 +50,21 @@ msg() {
 get_pod_state() {
     get_pod_state_name="$1"
     get_pod_state_flags="$2"
+    # require all status.conditions[*].status to be defined and True
     get_pod_state_output1=$(kubectl get pods "$get_pod_state_name" $get_pod_state_flags $KUBECTL_ARGS -o go-template='
 {{- define "checkStatus" -}}
-  {{- $rootStatus := .status }}
-  {{- range .status.conditions -}}
-      {{- if and (eq .type "Ready") (eq .status "False") -}}
-      {{- if .reason -}}
-        {{- if ne .reason "PodCompleted" -}}
-          {{ .status }}
-          {{- range $rootStatus.containerStatuses -}}
-            {{- if .state.terminated.reason -}}
-            :{{ .state.terminated.reason }}
+    {{- $rootStatus := .status }}
+    {{- if (not .status.conditions) }}
+        {{- printf "no .status.conditions yet\n" -}}
+    {{- else }}
+        {{- range .status.conditions -}}
+            {{- if (not .status) -}}
+                {{- printf "no .status.conditions.status yet\n" -}}
+            {{- else if (eq .status "False") -}}
+                {{- printf "type status reason: %s %s %s\n" .type .status .reason -}}
             {{- end -}}
-          {{- end -}}
         {{- end -}}
-      {{- else -}}
-        {{ .status }}
-      {{- end -}}
-      {{- end -}}
-  {{- else -}}
-    {{- printf "No resources found.\n" -}}
-  {{- end -}}
+    {{- end -}}
 {{- end -}}
 {{- if .items -}}
     {{- range .items -}}
@@ -79,6 +73,7 @@ get_pod_state() {
 {{- else -}}
     {{ template "checkStatus" . }}
 {{- end -}}' 2>&1)
+    #msg "get_pod_state_output1: $get_pod_state_output1"
     if [ $? -ne 0 ]; then
         if expr match "$get_pod_state_output1" '\(.*not found$\)' 1>/dev/null ; then
             msg "No pods found, waiting for them to be created..."
@@ -97,6 +92,7 @@ get_pod_state() {
         fi
     fi
     get_pod_state_output2=$(printf "%s" "$get_pod_state_output1" | xargs )
+    #msg "get_pod_state_output2: $get_pod_state_output2"
     if [ $DEBUG -ge 1 ]; then
         echo "$get_pod_state_output2" >&2
     fi
