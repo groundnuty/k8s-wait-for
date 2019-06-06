@@ -147,7 +147,7 @@ get_job_state() {
     
     # Map triplets of <running>:<succeeded>:<failed> to not ready (emit 0) state
     if [ $TREAT_ERRORS_AS_READY -eq 0 ]; then
-        sed_reg='-e s/^[1-9]+:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:[[:digit:]]+:[1-9]+$/1/p'
+        sed_reg='-e s/^[1-9]+:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:0:[1-9]+$/1/p'
     else
         sed_reg='-e s/^[1-9]+:[[:digit:]]+:[[:digit:]]+$/1/p'
     fi
