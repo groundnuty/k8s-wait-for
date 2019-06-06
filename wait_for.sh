@@ -114,7 +114,7 @@ get_service_state() {
     get_service_state_states=""
     for get_service_state_selector in $get_service_state_selectors ; do
         get_service_state_selector=$(echo "$get_service_state_selector" | tr ',' ' ')
-        get_service_state_state=$(get_pod_state "" "$get_service_state_selector")
+        get_service_state_state=$(get_pod_state "$get_service_state_selectors")
         get_service_state_states="${get_service_state_states}${get_service_state_state}" ;
     done
     echo "$get_service_state_states"
