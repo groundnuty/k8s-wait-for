@@ -48,25 +48,33 @@ get_pod_state() {
     get_pod_state_output1=$(kubectl get pods "$get_pod_state_name" $get_pod_state_flags $KUBECTL_ARGS -o go-template='
 {{- define "checkStatus" -}}
   {{- $rootStatus := .status }}
+  {{- $hasReadyStatus := false }}
   {{- range .status.conditions -}}
-      {{- if and (eq .type "Ready") (eq .status "False") -}}
-      {{- if .reason -}}
-        {{- if ne .reason "PodCompleted" -}}
-          {{ .status }}
-          {{- range $rootStatus.containerStatuses -}}
-            {{- if .state.terminated.reason -}}
-            :{{ .state.terminated.reason }}
+    {{- if eq .type "Ready" -}}
+      {{- $hasReadyStatus = true }}
+      {{- if eq .status "False" -}}
+        {{- if .reason -}}
+          {{- if ne .reason "PodCompleted" -}}
+            {{ .status }}
+            {{- range $rootStatus.containerStatuses -}}
+              {{- if .state.terminated.reason -}}
+              :{{ .state.terminated.reason }}
+              {{- end -}}
             {{- end -}}
           {{- end -}}
+        {{- else -}}
+          {{ .status }}
         {{- end -}}
-      {{- else -}}
-        {{ .status }}
       {{- end -}}
-      {{- end -}}
+    {{- end -}}
   {{- else -}}
     {{- printf "No resources found.\n" -}}
   {{- end -}}
+  {{- if ne $hasReadyStatus true -}}
+    {{- printf "False" -}}
+  {{- end -}}
 {{- end -}}
+
 {{- if .items -}}
     {{- range .items -}}
       {{ template "checkStatus" . }}
