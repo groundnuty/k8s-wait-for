@@ -157,8 +157,8 @@ get_job_state() {
     if [ $TREAT_ERRORS_AS_READY -eq 0 ]; then
         # Two conditions: 
         #   - pods are distributed between all 3 states with at least 1 pod running - then emit 1
-        #   - or some pods have failed and some have are completed - also emit 1
-        sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:0:[1-9][[:digit:]]+$/1/p'
+        #   - or more then 1 pod have failed and some are completed - also emit 1
+        sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:[[:digit:]]+:[1-9][[:digit:]]+$/1/p'
     else
         # When allowing for failed jobs
         #   - pods are distributed between all 3 states with at least 1 pod running- then emit 1
