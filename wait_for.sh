@@ -153,11 +153,17 @@ get_job_state() {
         echo "$get_job_state_output1" >&2
     fi
     
-    # Map triplets of <running>:<succeeded>:<failed> to not ready (emit 0) state
+    # Map triplets of <running>:<succeeded>:<failed> to not ready (emit 1) state
     if [ $TREAT_ERRORS_AS_READY -eq 0 ]; then
-        sed_reg='-e s/^[1-9]+:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:0:[1-9]+$/1/p'
+        # Two conditions: 
+        #   - pods are distributed between all 3 states with at least 1 pod running - then emit 1
+        #   - or some pods have failed and some have are completed - also emit 1
+        sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:0:[1-9][[:digit:]]+$/1/p'
     else
-        sed_reg='-e s/^[1-9]+:[[:digit:]]+:[[:digit:]]+$/1/p'
+        # When allowing for failed jobs
+        #   - pods are distributed between all 3 states with at least 1 pod running- then emit 1
+        #   - all other options include all pods Completed or Failed - which are fine
+        sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p'
     fi
     
     get_job_state_output2=$(printf "%s" "$get_job_state_output1" | sed -nr $sed_reg 2>&1)
