@@ -110,13 +110,24 @@ get_pod_state() {
 # example output with 2 services each matching a single pod would be: "falsefalse"
 get_service_state() {
     get_service_state_name="$1"
-    get_service_state_selectors=$(kubectl get service "$get_service_state_name" $KUBECTL_ARGS -ojson 2>&1 | jq -cr 'if . | has("items") then .items[] else . end | [ .spec.selector | to_entries[] | "\(.key)=\(.value)" ] | join(",") ')
+    get_service_state_selectors=$(kubectl get service "$get_service_state_name" $KUBECTL_ARGS -ojson | jq -cr 'if . | has("items") then .items[] else . end | [ .spec.selector | to_entries[] | "\(.key)=\(.value)" ] | join(",") ' 2>&1)
+    if [ $? -ne 0 ]; then
+        echo "$get_service_state_selectors" >&2
+        kill -s TERM $TOP_PID
+    elif [ $DEBUG -ge 2 ]; then
+        echo "$get_service_state_selectors" >&2
+    fi
     get_service_state_states=""
-    for get_service_state_selector in $get_service_state_selectors ; do
-        get_service_state_selector=$(echo "$get_service_state_selector" | tr ',' ' ')
-        get_service_state_state=$(get_pod_state -l"$get_service_state_selectors")
-        get_service_state_states="${get_service_state_states}${get_service_state_state}" ;
-    done
+    if [ "$get_service_state_selectors" = "" ] ; then
+        echo "No services found, waiting for them to be created..." >&2
+        get_service_state_states="false" # have to return that something is not ready, as empty implies everything is ready
+    else
+        for get_service_state_selector in $get_service_state_selectors ; do
+            get_service_state_selector=$(echo "$get_service_state_selector" | tr ',' ' ')
+            get_service_state_state=$(get_pod_state -l"$get_service_state_selectors")
+            get_service_state_states="${get_service_state_states}${get_service_state_state}" ;
+        done
+    fi
     echo "$get_service_state_states"
 }
 
