@@ -21,10 +21,10 @@ ${0##*/} pod [<pod name> | -l<kubectl selector>]
 ${0##*/} service [<service name> | -l<kubectl selector>]
 
 Examples:
-Wait for all pods with with a following label to enter 'Ready' state:
+Wait for all pods with a following label to enter 'Ready' state:
 ${0##*/} pod -lapp=develop-volume-gluster-krakow
 
-Wait for all pods with with a following label to enter 'Ready' or 'Error' state:
+Wait for all pods with a following label to enter 'Ready' or 'Error' state:
 ${0##*/} pod-we -lapp=develop-volume-gluster-krakow
 
 Wait for all the pods in that job to have a 'Succeeded' state:
