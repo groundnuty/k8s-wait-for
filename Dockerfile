@@ -1,4 +1,5 @@
-FROM alpine:3.7
+# alpine:3.12.1
+FROM alpine@sha256:c0e9560cda118f9ec63ddefb4a173a2b2a0347082d7dff7dc14272e7841a5b5a
 
 MAINTAINER Michal Orzechowski <orzechowski.michal@gmail.com>
 
@@ -13,10 +14,9 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
 
 ENV KUBE_LATEST_VERSION="v1.18.1"
 
-RUN apk add --update ca-certificates curl jq \
+RUN apk add --no-cache ca-certificates=20191127-r4 curl=7.69.1-r1 jq=1.6-r1 \
  && curl -L https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl \
- && chmod +x /usr/local/bin/kubectl \
- && rm /var/cache/apk/*
+ && chmod +x /usr/local/bin/kubectl
 
 ADD wait_for.sh /usr/local/bin/wait_for.sh
 
