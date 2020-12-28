@@ -145,7 +145,7 @@ get_job_state() {
     elif [ $DEBUG -ge 2 ]; then
         echo "$get_job_state_output" >&2
     fi
-    if [ "$get_job_state_output" = "" ]; then
+    if [[ "$get_job_state_output" = "" || "$get_job_state_output" == *"No resources found"* ]]; then
         echo "wait_for.sh: No jobs found!" >&2
         kill -s TERM $TOP_PID
     fi
