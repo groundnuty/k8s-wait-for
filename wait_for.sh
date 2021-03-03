@@ -12,6 +12,10 @@ WAIT_TIME="${WAIT_TIME:-2}" # seconds
 DEBUG="${DEBUG:-0}"
 TREAT_ERRORS_AS_READY=0
 
+if [ $DEBUG -ge 3 ]; then
+    set -x
+fi
+
 usage() {
 cat <<EOF
 This script waits until a job, pod or service enter ready state. 
