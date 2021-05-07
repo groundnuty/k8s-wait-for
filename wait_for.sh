@@ -11,6 +11,7 @@ KUBECTL_ARGS=""
 WAIT_TIME="${WAIT_TIME:-2}" # seconds
 DEBUG="${DEBUG:-0}"
 TREAT_ERRORS_AS_READY=0
+FAIL_ON_ERROR="${FAIL_ON_ERROR:-1}"
 
 usage() {
 cat <<EOF
@@ -163,7 +164,15 @@ get_job_state() {
     if [ $DEBUG -ge 1 ]; then
         echo "$get_job_state_output1" >&2
     fi
-    
+
+    if [ $FAIL_ON_ERROR -eq 1 ]; then
+      error_jobs=$(printf "%s" "$get_job_state_output" | sed -nr 's#.*:[[:blank:]]+([[:digit:]]+) [[:alpha:]]+ / ([[:digit:]]+) [[:alpha:]]+ / ([[:digit:]]+) [[:alpha:]]+.*#\3#p' 2>&1)
+
+      if [ "$error_jobs" -gt 0 ]; then
+        failed "$wait_for_resource_type" "$wait_for_resource_descriptor"
+      fi
+    fi
+
     # Map triplets of <running>:<succeeded>:<failed> to not ready (emit 1) state
     if [ $TREAT_ERRORS_AS_READY -eq 0 ]; then
         # Two conditions: 
@@ -205,6 +214,13 @@ ready() {
     print_KUBECTL_ARGS="$KUBECTL_ARGS"
     [ "$print_KUBECTL_ARGS" != "" ] && print_KUBECTL_ARGS=" $print_KUBECTL_ARGS"
     printf "[%s] %s %s%s is ready.\\n" "$(date +'%Y-%m-%d %H:%M:%S')" "$1" "$2" "$print_KUBECTL_ARGS"
+}
+
+failed() {
+    print_KUBECTL_ARGS="$KUBECTL_ARGS"
+    [ "$print_KUBECTL_ARGS" != "" ] && print_KUBECTL_ARGS=" $print_KUBECTL_ARGS"
+    printf "[%s] %s %s%s failed.\\n" "$(date +'%Y-%m-%d %H:%M:%S')" "$1" "$2" "$print_KUBECTL_ARGS" >&2
+    kill -s TERM $TOP_PID
 }
 
 main() {
