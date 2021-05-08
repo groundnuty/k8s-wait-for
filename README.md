@@ -202,3 +202,5 @@ or use these command lines which add services and deployments to the pods in tho
 `kubectl create role pod-reader --verb=get --verb=list --verb=watch --resource=pods,services,deployments`   
 
 `kubectl create rolebinding default-pod-reader --role=pod-reader --serviceaccount=default:default --namespace=default`
+
+An extensive discussion on the problem of granting necessary permisions and a number of example solutions can be found [here](https://github.com/groundnuty/k8s-wait-for/issues/6).
