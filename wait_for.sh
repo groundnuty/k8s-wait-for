@@ -33,7 +33,7 @@ ${0##*/} job develop-volume-s3-krakow-init
 Wait for all the pods in that job to have a 'Succeeded' or 'Failed' state:
 ${0##*/} job-we develop-volume-s3-krakow-init
 
-Wait for at least one pod in that job to have 'Succeeded' state, pods with 'Failed' state does not matter:
+Wait for at least one pod in that job to have 'Succeeded' state, does not mind some 'Failed' ones:
 ${0##*/} job-wr develop-volume-s3-krakow-init
 
 Wait for all selected pods to enter the 'Ready' state:
