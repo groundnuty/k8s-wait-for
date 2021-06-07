@@ -33,6 +33,9 @@ ${0##*/} job develop-volume-s3-krakow-init
 Wait for all the pods in that job to have a 'Succeeded' or 'Failed' state:
 ${0##*/} job-we develop-volume-s3-krakow-init
 
+Wait for at least one pod in that job to have 'Succeeded' state, pods with 'Failed' state does not matter:
+${0##*/} job-wr develop-volume-s3-krakow-init
+
 Wait for all selected pods to enter the 'Ready' state:
 ${0##*/} pod -l"release in (develop), chart notin (cross-support-job-3p)"
 
@@ -145,7 +148,7 @@ get_job_state() {
     elif [ $DEBUG -ge 2 ]; then
         echo "$get_job_state_output" >&2
     fi
-    if [[ "$get_job_state_output" == "" || "$get_job_state_output" == *"No resources found"* ]]; then
+    if [ "$get_job_state_output" = "" ]; then
         echo "wait_for.sh: No jobs found!" >&2
         kill -s TERM $TOP_PID
     fi
@@ -170,6 +173,13 @@ get_job_state() {
         #   - pods are distributed between all 3 states with at least 1 pod running - then emit 1
         #   - or more then 1 pod have failed and some are completed - also emit 1
         sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:[[:digit:]]+:[1-9][[:digit:]]*$/1/p'
+    elif [ $TREAT_ERRORS_AS_READY -eq 2 ]; then
+        # When allowing for failed jobs but at least one pod have to Succeed
+        #   - pods are distributed between all 3 states with at least 1 pod running- then emit 1
+        #   - some pods are failed, but no pod is completed yet - then emit 1
+        #   - when no pod is running and at least one is completed - all is fine
+        sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:0:[[:digit:]]+$/1/p'
+    fi
     else
         # When allowing for failed jobs
         #   - pods are distributed between all 3 states with at least 1 pod running- then emit 1
@@ -220,6 +230,11 @@ main() {
         pod-we|job-we)
             main_resource=${1%-we}
             TREAT_ERRORS_AS_READY=1
+            shift
+            ;;
+        pod-wr|job-wr)
+            main_resource=${1%-wr}
+            TREAT_ERRORS_AS_READY=2
             shift
             ;;
         *)
