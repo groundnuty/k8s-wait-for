@@ -188,3 +188,19 @@ develop-volume-s3-krakow-23786741-pdxtj                1/1       Running        
 develop-volume-s3-lisbon-3912793669-d4xh5              1/1       Running           0          59s
 develop-volume-s3-paris-124394749-qwt18                1/1       Running           0          57s
 ```
+## Troubleshooting
+
+Verify that you can access the Kubernetes API from within the k8s-wait-for container by running `kubectl get services`. If you get a permissions error like   
+
+`Error from server (Forbidden): services is forbidden: User "system:serviceaccount:default:default" cannot list resource "services" in API group "" in the namespace "default"`   
+
+the pod lacks the permissions to perform the `kubectl get` query. To fix this, follow the instrctions for the 'pod-reader' role and clusterrole at   
+
+https://kubernetes.io/docs/reference/access-authn-authz/rbac/#kubectl-create-role
+
+or use these command lines which add services and deployments to the pods in those examples:      
+`kubectl create role pod-reader --verb=get --verb=list --verb=watch --resource=pods,services,deployments`   
+
+`kubectl create rolebinding default-pod-reader --role=pod-reader --serviceaccount=default:default --namespace=default`
+
+An extensive discussion on the problem of granting necessary permisions and a number of example solutions can be found [here](https://github.com/groundnuty/k8s-wait-for/issues/6).
