@@ -173,18 +173,17 @@ get_job_state() {
         #   - pods are distributed between all 3 states with at least 1 pod running - then emit 1
         #   - or more then 1 pod have failed and some are completed - also emit 1
         sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:[[:digit:]]+:[1-9][[:digit:]]*$/1/p'
+    elif [ $TREAT_ERRORS_AS_READY -eq 1 ]; then
+        # When allowing for failed jobs
+        #   - pods are distributed between all 3 states with at least 1 pod running- then emit 1
+        #   - all other options include all pods Completed or Failed - which are fine
+        sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p'
     elif [ $TREAT_ERRORS_AS_READY -eq 2 ]; then
         # When allowing for failed jobs but at least one pod have to Succeed
         #   - pods are distributed between all 3 states with at least 1 pod running- then emit 1
         #   - some pods are failed, but no pod is completed yet - then emit 1
         #   - when no pod is running and at least one is completed - all is fine
         sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:0:[[:digit:]]+$/1/p'
-    fi
-    else
-        # When allowing for failed jobs
-        #   - pods are distributed between all 3 states with at least 1 pod running- then emit 1
-        #   - all other options include all pods Completed or Failed - which are fine
-        sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p'
     fi
     
     get_job_state_output2=$(printf "%s" "$get_job_state_output1" | sed -nr $sed_reg 2>&1)
