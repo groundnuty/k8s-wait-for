@@ -14,7 +14,7 @@ TREAT_ERRORS_AS_READY=0
 
 usage() {
 cat <<EOF
-This script waits until a job, pod or service enter ready state. 
+This script waits until a job, pod or service enter ready state.
 
 ${0##*/} job [<job name> | -l<kubectl selector>]
 ${0##*/} pod [<pod name> | -l<kubectl selector>]
@@ -166,10 +166,10 @@ get_job_state() {
     if [ $DEBUG -ge 1 ]; then
         echo "$get_job_state_output1" >&2
     fi
-    
+
     # Map triplets of <running>:<succeeded>:<failed> to not ready (emit 1) state
     if [ $TREAT_ERRORS_AS_READY -eq 0 ]; then
-        # Two conditions: 
+        # Two conditions:
         #   - pods are distributed between all 3 states with at least 1 pod running - then emit 1
         #   - or more then 1 pod have failed and some are completed - also emit 1
         sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:[[:digit:]]+:[1-9][[:digit:]]*$/1/p'
@@ -185,7 +185,7 @@ get_job_state() {
         #   - when no pod is running and at least one is completed - all is fine
         sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:0:[[:digit:]]+$/1/p'
     fi
-    
+
     get_job_state_output2=$(printf "%s" "$get_job_state_output1" | sed -nr $sed_reg 2>&1)
     if [ $DEBUG -ge 1 ]; then
         echo "$get_job_state_output2" >&2
