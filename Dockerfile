@@ -7,8 +7,6 @@ ARG VCS_REF
 ARG BUILD_DATE
 ARG TARGET_PLATFORM
 
-RUN echo $TARGET_PLATFORM
-
 # Metadata
 LABEL org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/groundnuty/k8s-wait-for" \
