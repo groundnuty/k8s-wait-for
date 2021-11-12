@@ -7,4 +7,10 @@ case $(uname -m) in
     arm64)  PLATFORM="arm64" ;;
     arm)    dpkg --print-architecture | grep -q "arm64" && PLATFORM="arm64" || PLATFORM="arm" ;;
 esac
+
+if [ -z $PLATFORM ]; then 
+  echo "Platform could not be detected, aborting...";
+  exit 1
+fi
+
 echo "$PLATFORM"
