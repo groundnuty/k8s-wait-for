@@ -1,13 +1,15 @@
 TAG = $(shell git describe --tags --always)
 PREFIX = $(shell git config --get remote.origin.url | tr ':.' '/'  | rev | cut -d '/' -f 3 | rev)
 REPO_NAME = $(shell git config --get remote.origin.url | tr ':.' '/'  | rev | cut -d '/' -f 2 | rev)
+TARGET = $(shell ./evaluate_platform.sh)
 
 all: push
 
 container: image
 
 image:
-	docker build -t $(PREFIX)/$(REPO_NAME):latest . # Build new image and automatically tag it as latest
+	@echo TARGET IS $(TARGET)
+	docker build --no-cache -t $(PREFIX)/$(REPO_NAME):latest . --build-arg TARGET_PLATFORM=$(TARGET) # Build new image and automatically tag it as latest
 	docker tag $(PREFIX)/$(REPO_NAME) $(PREFIX)/$(REPO_NAME):$(TAG)  # Add the version tag to the latest image
 
 push: image
