@@ -15,7 +15,7 @@ A simple script that allows waiting for a k8s service, job or pods to enter the 
 You can start simple. Run it on your cluster in a namespace you already have something deployed:
 
 ```bash
-kubectl run --generator=run-pod/v1 k8s-wait-for --rm -it --image groundnuty/k8s-wait-for:v1.3 --restart Never --command /bin/sh
+kubectl run k8s-wait-for --rm -it --image groundnuty/k8s-wait-for:v1.3 --restart Never --command /bin/sh
 ```
 
 Read `--help` and play with it!
