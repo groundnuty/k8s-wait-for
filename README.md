@@ -1,8 +1,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/groundnuty/k8s-wait-for?logo=GitHub)](https://github.com/groundnuty/k8s-wait-for/releases/latest)
 [![Build Status](https://travis-ci.org/groundnuty/k8s-wait-for.svg?branch=master)](https://travis-ci.org/groundnuty/k8s-wait-for)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9e61e311725b4015a24f294c591746b1)](https://www.codacy.com/app/groundnuty/k8s-wait-for?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=groundnuty/k8s-wait-for&amp;utm_campaign=Badge_Grade)
-[![Latest Docker Yag](https://img.shields.io/docker/v/groundnuty/k8s-wait-for?logo=docker)](https://microbadger.com/images/groundnuty/k8s-wait-for "Get your own version badge on microbadger.com")
-[![Latest Docker Tag Details](https://images.microbadger.com/badges/image/groundnuty/k8s-wait-for.svg?logo=docker)](https://microbadger.com/images/groundnuty/k8s-wait-for "Get your own image badge on microbadger.com")
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/607e33a0f020475f867fcf443bdab51b)](https://www.codacy.com/gh/groundnuty/k8s-wait-for/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=groundnuty/k8s-wait-for&amp;utm_campaign=Badge_Grade)
+[![Latest Docker TYag](https://img.shields.io/docker/v/groundnuty/k8s-wait-for?logo=docker)](https://microbadger.com/images/groundnuty/k8s-wait-for "Get your own version badge on microbadger.com")
 
 # k8s-wait-for
 
