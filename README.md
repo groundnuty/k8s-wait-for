@@ -112,8 +112,8 @@ spec:
 
 This container is used extensively in deployments of Onedata system [onedata/charts](https://github.com/onedata/charts) to specify dependencies. It leverages Kubernetes [init containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/), thus providing:
 
-- a detailed event log in `kubectl describe <pod>`, on what init container is pod hanging at the moment.
-- a comprehensive view in `kubectl get pods` output where init containers are shown in a form `Init:<ready>/<total>`
+  - a detailed event log in `kubectl describe <pod>`, on what init container is pod hanging at the moment.
+  - a comprehensive view in `kubectl get pods` output where init containers are shown in a form `Init:<ready>/<total>`
 
 Example output from the deployment run of ~16 pod with dependencies just after deployment:
 
@@ -208,4 +208,3 @@ or use these command lines which add services and deployments to the pods in tho
 An extensive discussion on the problem of granting necessary permisions and a number of example solutions can be found [here](https://github.com/groundnuty/k8s-wait-for/issues/6).
 
 Make sure the service account is mounted. `The connection to the server localhost:8080 was refused - did you specify the right host or port?` might indicate that the service account is not mounted to the pod. Double check wether your service account and pod define `automountServiceAccountToken: true`. If the service account is mounted, you should see files inside `/var/run/secrets/kubernetes.io/serviceaccount` folder, otherwise `/var/run/secrets/kubernetes.io` might not exist at all.
-
