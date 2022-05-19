@@ -22,6 +22,16 @@ deploy:
     on:
       branch: master
       tags: true
+
+jobs:
+  include:
+    - stage: create multi-arch
+      script:
+      - echo -n "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+      - echo -n "${GHCR_PASSWORD}" | docker login -u "${GHCR_USERNAME}" --password-stdin ghcr.io
+      - make push-multi-arch-docker-hub
+
+
 env:
   global:
   - secure: hs8m9KkJ+sBwQr4FF/ZGFDpK25n4K3q6R/KU0q++m27G0D2XtO+JeTQnRi8cV/8JGcYClBUIqkIXoKxpohuZ+LrTUGtPL/KUjsMshV59PTqvCrlkCmUfMrM0DowwVW1O7g2T+gPsr0rj++FUxTtk0s12sHZdxTDFrNTtdFD6Et6BXO6UIlDy2PhhLXNf7kxa7OpWPOWXosU6bBuj4NjaGXpYSWIJPnxMbmfGcmOpudPeRJGJsqDmHy3YKZ8IDWKOsDNOKmltOAzG3qhQP2DhHfjC4Tpmou3AOD2SdI5ekwPvQpa4cWo7LOw6l6PYtz7MhfchnQR5+KXvTu+JvGt3LDJeuE8PmFzefOxO2fUoEjNGFa3hRxGzJ4UyzxyXrqwPH4XBm4x1sqVFqMEwkY3AsuACGk4+1CSVkXORtE4GrhLBi52cJ7EI0Qq02+WjSKGppRg1OjIX0ZRG/mGOnt/qqHLSfxmRJGPIgtIALtsTbbHZwQN67se08p1+4JHgQ6G4tEV27Kmsu6tz2oAJrOuPrhCNltRFPhYw3A4U4jIO9ziMJHSMLtsHu48cOTtw2tVNW4mss6wadqpL4akX7uEiFoBrf0YFQ1cpImtpjRcAV8izBFiLYYLnQrnXUAPDFIEPEgyax8JATWVCS1qnfbdB3++6CUEMceTpBpY7dQVimKY=
