@@ -1,5 +1,4 @@
-# alpine:3.15.4
-FROM alpine@sha256:a777c9c66ba177ccfea23f2a216ff6721e78a662cd17019488c417135299cd89
+FROM alpine:3.15.4
 
 MAINTAINER Michal Orzechowski <orzechowski.michal@gmail.com>
 
