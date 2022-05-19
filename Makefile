@@ -50,7 +50,7 @@ manifest-docker-hub:
 	$(ARCHS_TAGGED)
 
 push-multi-arch-docker-hub: manifest-docker-hub
-	docker push $(PREFIX)/$(REPO_NAME):latest
-	docker push $(PREFIX)/$(REPO_NAME):$(TAG)
+	docker push docker.io/$(PREFIX)/$(REPO_NAME):latest
+	docker push docker.io/$(PREFIX)/$(REPO_NAME):$(TAG)
 
 clean:
