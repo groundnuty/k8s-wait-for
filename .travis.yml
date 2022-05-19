@@ -31,7 +31,7 @@ jobs:
       script:
       - echo -n "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
       - echo -n "${GHCR_PASSWORD}" | docker login -u "${GHCR_USERNAME}" --password-stdin ghcr.io
-      - make push-multi-arch-docker-hub
+      - make image-and-push-buildx
 
 
 env:
