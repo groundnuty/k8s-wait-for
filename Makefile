@@ -43,7 +43,7 @@ manifest-docker-hub: ARCHS_LATEST = $(foreach ARCH,$(MANIFEST_ARCHS), $(PREFIX)/
 manifest-docker-hub: ARCHS_TAGGED = $(foreach ARCH,$(MANIFEST_ARCHS), $(PREFIX)/$(REPO_NAME):$(TAG)-$(ARCH))
 manifest-docker-hub:
 	docker pull docker.io/$(PREFIX)/$(REPO_NAME):latest-amd64
-	docker tag  docker.io/$(PREFIX)/$(REPO_NAME):latest docker.io/$(PREFIX)/$(REPO_NAME):latest-amd64
+	docker tag  docker.io/$(PREFIX)/$(REPO_NAME):latest-amd64  docker.io/$(PREFIX)/$(REPO_NAME):latest
 	docker manifest create \
 	$(PREFIX)/$(REPO_NAME):latest \
 	$(ARCHS_LATEST)
