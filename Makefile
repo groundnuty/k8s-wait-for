@@ -1,7 +1,12 @@
 TAG = $(shell git describe --tags --always)
 PREFIX = $(shell git config --get remote.origin.url | tr ':.' '/'  | rev | cut -d '/' -f 3 | rev)
 REPO_NAME = $(shell git config --get remote.origin.url | tr ':.' '/'  | rev | cut -d '/' -f 2 | rev)
-TARGET = $(shell ./evaluate_platform.sh)
+TARGET := $(if $(TARGET),$(TARGET),$(shell ./evaluate_platform.sh))
+VCS_REF = $(shell git rev-parse --short HEAD)
+BUILD_DATE = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+BUILD_FLAGS := $(if $(BUILD_FLAGS),$(BUILD_FLAGS),--load --no-cache)
+BUILDER_NAME = k8s-wait-for-builder
+DOCKER_TAGS= $(PREFIX)/$(REPO_NAME):latest $(PREFIX)/$(REPO_NAME):$(TAG) ghcr.io/$(PREFIX)/$(REPO_NAME):latest ghcr.io/$(PREFIX)/$(REPO_NAME):$(TAG)
 
 all: push
 
@@ -9,19 +14,20 @@ container: image
 
 image:
 	@echo TARGET IS $(TARGET)
-	docker build --no-cache -t $(PREFIX)/$(REPO_NAME):latest . --build-arg TARGET_PLATFORM=$(TARGET) # Build new image and automatically tag it as latest
-	docker tag $(PREFIX)/$(REPO_NAME) $(PREFIX)/$(REPO_NAME):$(TAG)  # Add the version tag to the latest image
-	docker tag $(PREFIX)/$(REPO_NAME) ghcr.io/$(PREFIX)/$(REPO_NAME):latest  # Tag latest for ghcr repository
-	docker tag $(PREFIX)/$(REPO_NAME) ghcr.io/$(PREFIX)/$(REPO_NAME):$(TAG)  # Tag the version tag for ghcr repository
+	if ! docker buildx inspect $(BUILDER_NAME) 2> /dev/null ; then docker buildx create --name $(BUILDER_NAME) ; fi
+	docker buildx build \
+		--builder=$(BUILDER_NAME) \
+		--platform=$(TARGET) \
+		--build-arg VCS_REF=$(VCS_REF) \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		$(BUILD_FLAGS) \
+		$(foreach TAG,$(DOCKER_TAGS),--tag $(TAG)) \
+		.
 
-push: push-docker-hub push-ghcr
-
-push-docker-hub: image
-	docker push $(PREFIX)/$(REPO_NAME):latest # Push image tagged as latest to docker hub repository
-	docker push $(PREFIX)/$(REPO_NAME):$(TAG) # Push version tagged image to docker hub repository (since this image is already pushed it will simply create or update version tag)
-
-push-ghcr: image
-	docker push ghcr.io/$(PREFIX)/$(REPO_NAME):latest # Push image tagged as latest to ghcr repository
-	docker push ghcr.io/$(PREFIX)/$(REPO_NAME):$(TAG) # Push version tagged image to ghcr repository (since this image is already pushed it will simply create or update version tag)
+push: BUILD_FLAGS:=$(BUILD_FLAGS:--load=)
+push: BUILD_FLAGS+=--push
+push: image
 
 clean:
+	if docker buildx inspect $(BUILDER_NAME) 2> /dev/null ; then docker buildx rm $(BUILDER_NAME) ; fi
+	$(foreach TAG,$(DOCKER_TAGS),docker rmi -f $(TAG); )

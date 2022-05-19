@@ -20,4 +20,4 @@ if [ -z $PLATFORM ]; then
   exit 1
 fi
 
-echo "$PLATFORM"
+echo "linux/$PLATFORM"
