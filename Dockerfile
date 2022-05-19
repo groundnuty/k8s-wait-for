@@ -12,7 +12,7 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.docker.dockerfile="/Dockerfile"
 
-ENV KUBE_LATEST_VERSION="v1.21.0"
+ENV KUBE_LATEST_VERSION="v1.24.0"
 
 RUN apk add --update --no-cache ca-certificates=20211220-r0 curl=7.80.0-r1 jq=1.6-r1 \
  && curl -L https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/$TARGET_PLATFORM/kubectl -o /usr/local/bin/kubectl \
