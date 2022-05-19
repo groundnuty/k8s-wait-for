@@ -10,6 +10,7 @@ container: image push
 
 image-and-push-buildx:
 	@echo TARGET IS $(TARGET)
+	docker buildx create --use
 	docker buildx build \
 		--no-cache \
 		--platform=linux/arm64,linux/amd64 \
