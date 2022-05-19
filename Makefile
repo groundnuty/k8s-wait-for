@@ -1,4 +1,4 @@
-TAG =  arm64-test-1
+TAG =  arm64-test-4
 PREFIX = $(shell git config --get remote.origin.url | tr ':.' '/'  | rev | cut -d '/' -f 3 | rev)
 REPO_NAME = $(shell git config --get remote.origin.url | tr ':.' '/'  | rev | cut -d '/' -f 2 | rev)
 TARGET = $(shell ./evaluate_platform.sh)
@@ -40,11 +40,9 @@ push-ghcr: image
 	docker push ghcr.io/$(PREFIX)/$(REPO_NAME):latest-$(TARGET) # Push image tagged as latest to ghcr repository
 	docker push ghcr.io/$(PREFIX)/$(REPO_NAME):$(TAG)-$(TARGET) # Push version tagged image to ghcr repository (since this image is already pushed it will simply create or update version tag)
 
-manifest-docker-hub: ARCHS_LATEST = $(foreach ARCH,$(MANIFEST_ARCHS), $(PREFIX)/$(REPO_NAME):latest-$(ARCH))
+manifest-docker-hub: ARCHS_LATEST = $(foreach ARCH,$(MANIFEST_ARCHS),--amend $(PREFIX)/$(REPO_NAME):latest-$(ARCH))
 manifest-docker-hub: ARCHS_TAGGED = $(foreach ARCH,$(MANIFEST_ARCHS), $(PREFIX)/$(REPO_NAME):$(TAG)-$(ARCH))
 manifest-docker-hub:
-	docker pull docker.io/$(PREFIX)/$(REPO_NAME):latest-amd64
-	docker tag  docker.io/$(PREFIX)/$(REPO_NAME):latest-amd64  docker.io/$(PREFIX)/$(REPO_NAME):latest
 	docker manifest create \
 	$(PREFIX)/$(REPO_NAME):latest \
 	$(ARCHS_LATEST)
@@ -53,7 +51,7 @@ manifest-docker-hub:
 	$(ARCHS_TAGGED)
 
 push-multi-arch-docker-hub: manifest-docker-hub
-	docker push docker.io/$(PREFIX)/$(REPO_NAME):latest
-	docker push docker.io/$(PREFIX)/$(REPO_NAME):$(TAG)
+	docker manifest push docker.io/$(PREFIX)/$(REPO_NAME):latest
+	docker manifest push docker.io/$(PREFIX)/$(REPO_NAME):$(TAG)
 
 clean:
