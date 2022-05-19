@@ -6,7 +6,7 @@ MANIFEST_ARCHS = amd64 arm64
 
 all: push
 
-container: image push-multi-arch-docker-hub
+container: image push
 
 image-and-push-buildx:
 	@echo TARGET IS $(TARGET)
@@ -41,7 +41,7 @@ push-ghcr: image
 
 manifest-docker-hub: ARCHS_LATEST = $(foreach ARCH,$(MANIFEST_ARCHS),--amend $(PREFIX)/$(REPO_NAME):latest-$(ARCH))
 manifest-docker-hub: ARCHS_TAGGED = $(foreach ARCH,$(MANIFEST_ARCHS),--amend $(PREFIX)/$(REPO_NAME):$(TAG)-$(ARCH))
-manifest-docker-hub: push-docker-hub
+manifest-docker-hub: 
 	docker manifest create \
 	$(PREFIX)/$(REPO_NAME):latest \
 	$(ARCHS_LATEST)
