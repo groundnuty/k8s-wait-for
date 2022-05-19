@@ -1,7 +1,8 @@
 [![Latest Release](https://img.shields.io/github/v/release/groundnuty/k8s-wait-for?logo=GitHub)](https://github.com/groundnuty/k8s-wait-for/releases/latest)
-[![Build Status](https://travis-ci.org/groundnuty/k8s-wait-for.svg?branch=master)](https://travis-ci.org/groundnuty/k8s-wait-for)
+[![Build Status](https://travis-ci.org/groundnuty/k8s-wait-for.svg?branch=master)](https://travis-ci.org/github/groundnuty/k8s-wait-for)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/607e33a0f020475f867fcf443bdab51b)](https://www.codacy.com/gh/groundnuty/k8s-wait-for/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=groundnuty/k8s-wait-for&amp;utm_campaign=Badge_Grade)
-[![Latest Docker TYag](https://img.shields.io/docker/v/groundnuty/k8s-wait-for?logo=docker)](https://microbadger.com/images/groundnuty/k8s-wait-for "Get your own version badge on microbadger.com")
+[![Latest Docker Tag](https://img.shields.io/docker/v/groundnuty/k8s-wait-for?logo=docker)](https://hub.docker.com/r/groundnuty/k8s-wait-for/tags)
+[![Latest GHCR Image](https://ghcr-badge.herokuapp.com/groundnuty/k8s-wait-for/tags?trim=major&n=1&label=GHCR%20Image)](https://github.com/groundnuty/k8s-wait-for/pkgs/container/k8s-wait-for)
 
 # k8s-wait-for
 
