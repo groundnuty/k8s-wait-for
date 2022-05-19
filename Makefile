@@ -39,8 +39,8 @@ push-ghcr: image
 	docker push ghcr.io/$(PREFIX)/$(REPO_NAME):latest-$(TARGET) # Push image tagged as latest to ghcr repository
 	docker push ghcr.io/$(PREFIX)/$(REPO_NAME):$(TAG)-$(TARGET) # Push version tagged image to ghcr repository (since this image is already pushed it will simply create or update version tag)
 
-manifest-docker-hub: ARCHS_LATEST = $(foreach ARCH,$(MANIFEST_ARCHS),--amend $(PREFIX)/$(REPO_NAME):latest-$(ARCH))
-manifest-docker-hub: ARCHS_TAGGED = $(foreach ARCH,$(MANIFEST_ARCHS),--amend $(PREFIX)/$(REPO_NAME):$(TAG)-$(ARCH))
+manifest-docker-hub: ARCHS_LATEST = $(foreach ARCH,$(MANIFEST_ARCHS), $(PREFIX)/$(REPO_NAME):latest-$(ARCH))
+manifest-docker-hub: ARCHS_TAGGED = $(foreach ARCH,$(MANIFEST_ARCHS), $(PREFIX)/$(REPO_NAME):$(TAG)-$(ARCH))
 manifest-docker-hub:
 	docker manifest create \
 	$(PREFIX)/$(REPO_NAME):latest \
