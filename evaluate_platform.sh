@@ -16,8 +16,8 @@ else
 fi
 
 if [ -z $PLATFORM ]; then 
-  echo "Platform could not be detected, aborting...";
-  exit 1
+    echo "Platform could not be detected, aborting...";
+    exit 1
 fi
 
 echo "linux/$PLATFORM"
