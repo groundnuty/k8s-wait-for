@@ -32,8 +32,14 @@ Examples:
 Wait for all pods with a following label to enter 'Ready' state:
 wait_for.sh pod -lapp=develop-volume-gluster-krakow
 
+Wait for all selected pods to enter the 'Ready' state:
+wait_for.sh pod -l"release in (develop), chart notin (cross-support-job-3p)"
+
 Wait for all pods with a following label to enter 'Ready' or 'Error' state:
 wait_for.sh pod-we -lapp=develop-volume-gluster-krakow
+
+Wait for at least one pod to enter the 'Ready' state, even when the other ones are in 'Error' state:
+wait_for.sh pod-wr -lapp=develop-volume-gluster-krakow
 
 Wait for all the pods in that job to have a 'Succeeded' state:
 wait_for.sh job develop-volume-s3-krakow-init
@@ -42,10 +48,7 @@ Wait for all the pods in that job to have a 'Succeeded' or 'Failed' state:
 wait_for.sh job-we develop-volume-s3-krakow-init
 
 Wait for at least one pod in that job to have 'Succeeded' state, does not mind some 'Failed' ones:
-${0##*/} job-wr develop-volume-s3-krakow-init
-
-Wait for all selected pods to enter the 'Ready' state:
-wait_for.sh pod -l"release in (develop), chart notin (cross-support-job-3p)"
+wait_for.sh job-wr develop-volume-s3-krakow-init
 ```
 
 ## Example

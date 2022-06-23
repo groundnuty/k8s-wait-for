@@ -24,8 +24,14 @@ Examples:
 Wait for all pods with a following label to enter 'Ready' state:
 ${0##*/} pod -lapp=develop-volume-gluster-krakow
 
+Wait for all selected pods to enter the 'Ready' state:
+${0##*/} pod -l"release in (develop), chart notin (cross-support-job-3p)"
+
 Wait for all pods with a following label to enter 'Ready' or 'Error' state:
 ${0##*/} pod-we -lapp=develop-volume-gluster-krakow
+
+Wait for at least one pod to enter the 'Ready' state, even when the other ones are in 'Error' state:
+${0##*/} pod-wr -lapp=develop-volume-gluster-krakow
 
 Wait for all the pods in that job to have a 'Succeeded' state:
 ${0##*/} job develop-volume-s3-krakow-init
@@ -35,9 +41,6 @@ ${0##*/} job-we develop-volume-s3-krakow-init
 
 Wait for at least one pod in that job to have 'Succeeded' state, does not mind some 'Failed' ones:
 ${0##*/} job-wr develop-volume-s3-krakow-init
-
-Wait for all selected pods to enter the 'Ready' state:
-${0##*/} pod -l"release in (develop), chart notin (cross-support-job-3p)"
 
 EOF
 exit 1
@@ -76,6 +79,9 @@ get_pod_state() {
   {{- if ne $hasReadyStatus true -}}
     {{- printf "False" -}}
   {{- end -}}
+  {{- if eq $hasReadyStatus true -}}
+    {{- printf "Ready" -}}
+  {{- end -}}
 {{- end -}}
 
 {{- if .items -}}
@@ -85,6 +91,7 @@ get_pod_state() {
 {{- else -}}
     {{ template "checkStatus" . }}
 {{- end -}}' 2>&1)
+
     if [ $? -ne 0 ]; then
         if expr match "$get_pod_state_output1" '\(.*not found$\)' 1>/dev/null ; then
             echo "No pods found, waiting for them to be created..." >&2
@@ -96,13 +103,25 @@ get_pod_state() {
     elif [ $DEBUG -ge 2 ]; then
         echo "$get_pod_state_output1" >&2
     fi
-    if [ $TREAT_ERRORS_AS_READY -eq 1 ]; then
-        get_pod_state_output1=$(printf "%s" "$get_pod_state_output1" | sed 's/False:Error//g' )
-        if [ $DEBUG -ge 1 ]; then
-            echo "$get_pod_state_output1" >&2
+
+    if [ $TREAT_ERRORS_AS_READY -eq 0 ]; then
+        get_pod_state_output1=$(printf "%s" "$get_pod_state_output1" | sed 's/Ready//g' )
+    elif [ $TREAT_ERRORS_AS_READY -eq 1 ]; then
+        get_pod_state_output1=$(printf "%s" "$get_pod_state_output1" | sed 's/Ready\|False:Error//g' )
+    elif [ $TREAT_ERRORS_AS_READY -eq 2 ]; then
+        if expr match "$get_pod_state_output1" '\(.*Ready.*\)' 1>/dev/null ; then
+          get_pod_state_output1=$(printf "%s" "$get_pod_state_output1" | sed 's/Ready\|False:Error//g' )
+        else
+          get_pod_state_output1='No pods ready'
         fi
     fi
+
+    if [ $DEBUG -ge 1 ]; then
+        echo "$get_pod_state_output1" >&2
+    fi
+
     get_pod_state_output2=$(printf "%s" "$get_pod_state_output1" | xargs )
+
     if [ $DEBUG -ge 1 ]; then
         echo "$get_pod_state_output2" >&2
     fi
@@ -137,7 +156,7 @@ get_service_state() {
 # Job or set of jobs is considered ready if all of them succeeded at least once
 # example output with 2 still running jobs would be "0 0"
 # this function considers the line:
-# Pods Statuses:	0 Running / 1 Succeeded / 0 Failed
+# Pods Statuses:    0 Running / 1 Succeeded / 0 Failed
 # in a 'kubectl describe' job output.
 get_job_state() {
     get_job_state_name="$1"
