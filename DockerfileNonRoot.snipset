@@ -1,0 +1,17 @@
+ENV USER=docker
+ENV UID=1100
+ENV GID=1100
+
+RUN addgroup -g $GID $USER && \
+    adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "$(pwd)" \
+    --ingroup "$USER" \
+    --no-create-home \
+    --uid "$UID" \
+    "$USER"
+
+USER $UID
+
+ADD --chown=$UID:$GID wait_for.sh /usr/local/bin/wait_for.sh

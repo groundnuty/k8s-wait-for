@@ -18,6 +18,7 @@ RUN apk add --update --no-cache ca-certificates=20220614-r0 curl=7.80.0-r2 jq=1.
     && curl -L https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/$TARGETARCH/kubectl -o /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
+# Replace for non-root version
 ADD wait_for.sh /usr/local/bin/wait_for.sh
 
 ENTRYPOINT ["wait_for.sh"]
