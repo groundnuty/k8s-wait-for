@@ -1,4 +1,4 @@
-FROM alpine:3.15.4
+FROM alpine:3.16.2
 
 MAINTAINER Michal Orzechowski <orzechowski.michal@gmail.com>
 
@@ -14,7 +14,7 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
 
 ENV KUBE_LATEST_VERSION="v1.24.0"
 
-RUN apk add --update --no-cache ca-certificates=20220614-r0 curl=7.80.0-r2 jq=1.6-r1 \
+RUN apk add --update --no-cache ca-certificates=20220614-r0 curl=7.83.1-r2 jq=1.6-r1 \
     && curl -L https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/$TARGETARCH/kubectl -o /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
