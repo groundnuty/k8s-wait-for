@@ -2,7 +2,9 @@ name: Trivy Security Scan
 
 on:
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+    inputs: {}
 
 jobs:
   security-scan:
@@ -23,3 +25,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'trivy-results.sarif'
+      - name: Fail if scan found vulnerabilities
+        run: |
+          grep -q '"rules": \[],' trivy-results.sarif
