@@ -38,22 +38,17 @@ jobs:
             TARGET: linux/amd64
             BUILD_FLAGS: --load --no-cache
         run: make images
-      - name: Retrieve version
-        run: |
-          echo "::set-output name=ROOT_IMAGE_ID::$(docker images  --filter=reference="*/*:v*${GITHUB_SHA::7}" --format '{{.ID}}')"
-          echo "::set-output name=NON_ROOT_IMAGE_ID::$(docker images  --filter=reference="*/*:no-root-v*${GITHUB_SHA::7}" --format '{{.ID}}')"
-        id: image_id
       - name: Run Trivy Vulnerability Scanner for Root Image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ steps.image_id.outputs.ROOT_IMAGE_ID }}'
+          image-ref: 'ghcr.io/groundnuty/k8s-wait-for:latest'
           exit-code: 1
           format: 'sarif'
           output: 'trivy-results-root.sarif'
       - name: Run Trivy Vulnerability Scanner for Non-Root Image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ steps.image_id.outputs.NON_ROOT_IMAGE_ID }}'
+          image-ref: 'ghcr.io/groundnuty/k8s-wait-for:no-root-latest'
           exit-code: 1
           format: 'sarif'
           output: 'trivy-results-non-root.sarif'
