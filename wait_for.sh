@@ -157,10 +157,12 @@ get_service_state() {
 # example output with 2 still running jobs would be "0 0"
 # this function considers the line:
 # Pods Statuses:    0 Running / 1 Succeeded / 0 Failed
+# Pods Statuses:    1 Active (0 Ready) / 0 Succeeded / 0 Failed
 # in a 'kubectl describe' job output.
 get_job_state() {
     get_job_state_name="$1"
     get_job_state_output=$(kubectl describe jobs "$get_job_state_name" $KUBECTL_ARGS 2>&1)
+
     if [ $? -ne 0 ]; then
         echo "$get_job_state_output" >&2
         kill -s TERM $TOP_PID
@@ -171,37 +173,34 @@ get_job_state() {
         echo "wait_for.sh: No jobs found!" >&2
         kill -s TERM $TOP_PID
     fi
-    get_job_state_output1=$(printf "%s" "$get_job_state_output" | sed -nr 's#.*:[[:blank:]]+([[:digit:]]+) [[:alpha:]]+ / ([[:digit:]]+) [[:alpha:]]+ / ([[:digit:]]+) [[:alpha:]]+.*#\1:\2:\3#p' 2>&1)
+
+    # Extract number of <avtive>:<ready>:<succeeded>:<failed>
+    # Ignore the Ready number, as it will alwasy be less or equal to Active number
+    get_job_state_output1=$(printf "%s" "$get_job_state_output" | sed -nr 's#.*:[[:blank:]]+([[:digit:]]+) [[:alpha:]]+ \(+([[:digit:]]+) [[:alpha:]]+\) / ([[:digit:]]+) [[:alpha:]]+ / ([[:digit:]]+) [[:alpha:]]+.*#\1:\3:\4#p' 2>&1)
     if [ $? -ne 0 ]; then
         echo "$get_job_state_output" >&2
         echo "$get_job_state_output1" >&2
         kill -s TERM $TOP_PID
     elif [ $DEBUG -ge 2 ]; then
-        echo "$get_job_state_output1" >&2
+        echo "${get_job_state_output1}" >&2
     fi
 
-    # Extract number of <running>:<succeeded>:<failed>
-    get_job_state_output1=$(printf "%s" "$get_job_state_output" | sed -nr 's#.*:[[:blank:]]+([[:digit:]]+) [[:alpha:]]+ / ([[:digit:]]+) [[:alpha:]]+ / ([[:digit:]]+) [[:alpha:]]+.*#\1:\2:\3#p' 2>&1)
-    if [ $DEBUG -ge 1 ]; then
-        echo "$get_job_state_output1" >&2
-    fi
-
-    # Map triplets of <running>:<succeeded>:<failed> to not ready (emit 1) state
+    # Map triplets of <avtive>:<succeeded>:<failed> to not ready (emit 1) state
     if [ $TREAT_ERRORS_AS_READY -eq 0 ]; then
         # Two conditions:
-        #   - pods are distributed between all 3 states with at least 1 pod running - then emit 1
-        #   - or more then 1 pod have failed and some are completed - also emit 1
+        #   - pods are distributed between all 3 states with at least 1 pod active - then emit 1
+        #   - or more then 0 pods have failed and some are completed - also emit 1
         sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:[[:digit:]]+:[1-9][[:digit:]]*$/1/p'
     elif [ $TREAT_ERRORS_AS_READY -eq 1 ]; then
         # When allowing for failed jobs
-        #   - pods are distributed between all 3 states with at least 1 pod running- then emit 1
+        #   - pods are distributed between all 3 states with at least 1 pod active - then emit 1
         #   - all other options include all pods Completed or Failed - which are fine
         sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p'
     elif [ $TREAT_ERRORS_AS_READY -eq 2 ]; then
         # When allowing for failed jobs but at least one pod have to Succeed
-        #   - pods are distributed between all 3 states with at least 1 pod running- then emit 1
+        #   - pods are distributed between all 3 states with at least 1 pod active - then emit 1
         #   - some pods are failed, but no pod is completed yet - then emit 1
-        #   - when no pod is running and at least one is completed - all is fine
+        #   - when no pod is active and at least one is completed - all is fine
         sed_reg='-e s/^[1-9][[:digit:]]*:[[:digit:]]+:[[:digit:]]+$/1/p -e s/^0:0:[[:digit:]]+$/1/p'
     fi
 
