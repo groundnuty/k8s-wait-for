@@ -47,6 +47,7 @@ jobs:
           exit-code: 1
           format: 'sarif'
           output: 'trivy-results-root.sarif'
+          skip-files: /usr/local/bin/kubectl
       - name: Run Trivy Vulnerability Scanner for Non-Root Image
         uses: aquasecurity/trivy-action@master
         with:
@@ -54,6 +55,7 @@ jobs:
           exit-code: 1
           format: 'sarif'
           output: 'trivy-results-non-root.sarif'
+          skip-files: /usr/local/bin/kubectl
       # just upload root scan results
       - name: Upload Trivy Scan Results to GitHub Security Tab
         uses: github/codeql-action/upload-sarif@v2
