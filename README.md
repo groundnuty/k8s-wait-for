@@ -1,10 +1,3 @@
-[![Latest Release](https://img.shields.io/github/v/release/groundnuty/k8s-wait-for?logo=GitHub)](https://github.com/groundnuty/k8s-wait-for/releases/latest)
-[![Build Status](https://github.com/groundnuty/k8s-wait-for/actions/workflows/build-and-publish.yml/badge.svg)](https://github.com/groundnuty/k8s-wait-for/actions/workflows/build-and-publish.yml)
-[![Trivy Security Scan](https://github.com/groundnuty/k8s-wait-for/actions/workflows/trivy.yml/badge.svg)](https://github.com/groundnuty/k8s-wait-for/actions/workflows/trivy.yml)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/607e33a0f020475f867fcf443bdab51b)](https://www.codacy.com/gh/groundnuty/k8s-wait-for/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=groundnuty/k8s-wait-for&amp;utm_campaign=Badge_Grade)
-[![Latest Docker Tag](https://img.shields.io/docker/v/groundnuty/k8s-wait-for?logo=docker)](https://hub.docker.com/r/groundnuty/k8s-wait-for/tags)
-[![Latest GHCR Image](https://ghcr-badge.herokuapp.com/groundnuty/k8s-wait-for/tags?n=1&label=GHCR%20Image)](https://github.com/groundnuty/k8s-wait-for/pkgs/container/k8s-wait-for)
-
 # k8s-wait-for
 
 > This tool is still actively used and working stably despite not too frequent commits! Pull requests are most welcome!
