@@ -1,9 +1,5 @@
 # k8s-wait-for
 
-> This tool is still actively used and working stably despite not too frequent commits! Pull requests are most welcome!
-
-> Important: For kubernetes versions <=1.23 use k8s-wait-for versions 1.*, see [here](https://github.com/groundnuty/k8s-wait-for/issues/60#issuecomment-1313483011).
-
 A simple script that allows waiting for a k8s service, job or pods to enter the desired state.
 
 ## Running

@@ -174,9 +174,9 @@ get_job_state() {
         kill -s TERM $TOP_PID
     fi
 
-    # Extract number of <avtive>:<ready>:<succeeded>:<failed>
-    # Ignore the Ready number, as it will alwasy be less or equal to Active number
-    get_job_state_output1=$(printf "%s" "$get_job_state_output" | sed -nr 's#.*:[[:blank:]]+([[:digit:]]+) [[:alpha:]]+ \(+([[:digit:]]+) [[:alpha:]]+\) / ([[:digit:]]+) [[:alpha:]]+ / ([[:digit:]]+) [[:alpha:]]+.*#\1:\3:\4#p' 2>&1)
+    # Extract number of <active>:<succeeded>:<failed>
+    # Ignore the Ready number if it exists, as it will always be less or equal to Active number
+    get_job_state_output1=$(printf "%s" "$get_job_state_output" | sed -nr 's#.*:[[:blank:]]+([[:digit:]]+) [[:alpha:]]+ (\(+[[:digit:]]+ [[:alpha:]]+\) )?/ ([[:digit:]]+) [[:alpha:]]+ / ([[:digit:]]+) [[:alpha:]]+.*#\1:\3:\4#p' 2>&1)
     if [ $? -ne 0 ]; then
         echo "$get_job_state_output" >&2
         echo "$get_job_state_output1" >&2
@@ -185,7 +185,7 @@ get_job_state() {
         echo "${get_job_state_output1}" >&2
     fi
 
-    # Map triplets of <avtive>:<succeeded>:<failed> to not ready (emit 1) state
+    # Map triplets of <active>:<succeeded>:<failed> to not ready (emit 1) state
     if [ $TREAT_ERRORS_AS_READY -eq 0 ]; then
         # Two conditions:
         #   - pods are distributed between all 3 states with at least 1 pod active - then emit 1
