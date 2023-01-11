@@ -1,0 +1,104 @@
+name: Docker Image Build
+
+env:
+  IMAGE_NAME: pegasystems/k8s-wait-for
+  MAJOR_MINOR: "3.1"
+  BUILD_NUMBER: $GITHUB_RUN_NUMBER
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron:  '0 12 * * *'
+
+jobs:
+  docker-login:
+    name: Login to DockerHub
+    if: ${{ github.ref == 'refs/heads/master' && github.repository == 'pegasystems/k8s-wait-for' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+#  Leaving commented for now
+#  test:
+#    name: Container Tests
+#    runs-on: ubuntu-latest
+#    if: always()
+#    needs: docker-login
+#    steps:
+#      - name: Check out working repository
+#        uses: actions/checkout@v2
+#
+#      - name: Run Container Tests
+#        run: |
+#          curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
+#          chmod +x container-structure-test-linux-amd64
+#          sudo mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+#          make test
+
+  scan:
+    name: Scan for CVEs
+    runs-on: ubuntu-latest
+    if: always()
+    needs: docker-login
+    steps:
+      - name: Check out working repository
+        uses: actions/checkout@v2
+
+      - name: Build Image
+        run: make image
+
+      - name: Scan image
+        id: scan
+        uses: anchore/scan-action@v3
+        with:
+          image: "pegasystems/k8s-wait-for:latest"
+          fail-build: true
+          severity-cutoff: "high"
+          acs-report-enable: true
+
+      - name: Log Scan Results
+        if: always()
+        run: |
+          echo "Failures:"
+          cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "critical" || true
+          cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "high" || true
+          echo "Warnings:"
+          cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "medium" || true
+          cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "low" || true
+          cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -iv "critical\|high\|medium\|low" || true
+
+      - name: Publish Scan Results as Artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-scan-results
+          path: ${{ steps.scan.outputs.sarif }}
+
+      - name: Upload Anchore Scan SARIF Report
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+
+  push:
+    name: Push to DockerHub
+    if: ${{ github.ref == 'refs/heads/master' && github.repository == 'pegasystems/k8s-wait-for' }}
+    runs-on: ubuntu-latest
+    # needs: [scan, test]
+    needs: [scan]
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Check out working repository
+        uses: actions/checkout@v2
+      - name: Push image to dockerhub
+        run: make push
