@@ -1,4 +1,4 @@
-TAG = $(shell git describe --tags --always)
+TAG = latest
 USER_NAME = $(shell git config --get remote.origin.url | sed 's/\.git$$//' | tr ':.' '/' | rev | cut -d '/' -f 2 | rev)
 REPO_NAME = $(shell git config --get remote.origin.url | sed 's/\.git$$//' | tr ':.' '/' | rev | cut -d '/' -f 1 | rev)
 TARGET := $(if $(TARGET),$(TARGET),$(shell ./evaluate_platform.sh))
@@ -7,7 +7,7 @@ BUILD_DATE = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 BUILD_FLAGS := $(if $(BUILD_FLAGS),$(BUILD_FLAGS),--load --no-cache)
 BUILDER_NAME = k8s-wait-for-builder
 NON_ROOT_DOCKERFILE = DockerfileNonRoot
-DOCKER_TAGS = $(USER_NAME)/$(REPO_NAME):$(TAG_PREFIX)latest $(USER_NAME)/$(REPO_NAME):$(TAG_PREFIX)$(TAG) ghcr.io/$(USER_NAME)/$(REPO_NAME):$(TAG_PREFIX)latest ghcr.io/$(USER_NAME)/$(REPO_NAME):$(TAG_PREFIX)$(TAG)
+DOCKER_TAGS = pegasystems/$(REPO_NAME):$(TAG_PREFIX)latest pegasystems/$(REPO_NAME):$(TAG_PREFIX)$(TAG) pegasystems/$(REPO_NAME):$(TAG_PREFIX)test
 
 all: push
 

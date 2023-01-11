@@ -1,0 +1,103 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+env:
+  TARGET: linux/amd64
+  BUILD_FLAGS: --no-cache
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # Need tags for Makefile logic to work
+          fetch-depth: 0
+      - name: Build the Docker images
+        run: make images
+  scan:
+    needs: [ "build" ]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # Need tags for Makefile logic to work
+          fetch-depth: 0
+
+      - name: Build the Docker image
+        env:
+          # amd build so that local 'docker images' can access images
+          TARGET: linux/amd64
+          BUILD_FLAGS: --load --no-cache
+        run: make images
+
+      - name: Scan image-root
+        id: scan
+        uses: anchore/scan-action@v3
+        with:
+          image: "pegasystems/k8s-wait-for:latest"
+          fail-build: true
+          severity-cutoff: "high"
+          acs-report-enable: true
+
+      - name: Log Scan Results
+        if: always()
+        run: |
+          echo "Failures:"
+          cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "critical" || true
+          cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "high" || true
+          echo "Warnings:"
+          cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "medium" || true
+          cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "low" || true
+          cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -iv "critical\|high\|medium\|low" || true
+
+      - name: Publish Scan Results as Artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-scan-results
+          path: ${{ steps.scan.outputs.sarif }}
+
+      - name: Upload Anchore Scan SARIF Report
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+
+  deploy:
+    name: Push to DockerHub
+    if: ${{ github.ref == 'refs/heads/master' && github.repository == 'pegasystems/k8s-wait-for' }}
+    runs-on: ubuntu-latest
+    # needs: [scan, test]
+    needs: [scan]
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Check out working repository
+        uses: actions/checkout@v2
+      - name: Push image to dockerhub
+        run: make push
+
+#  Leaving commented for now
+#  test:
+#    name: Container Tests
+#    runs-on: ubuntu-latest
+#    if: always()
+#    needs: docker-login
+#    steps:
+#      - name: Check out working repository
+#        uses: actions/checkout@v2
+#
+#      - name: Run Container Tests
+#        run: |
+#          curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
+#          chmod +x container-structure-test-linux-amd64
+#          sudo mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+#          make test

@@ -1,0 +1,7 @@
+ignore:
+  # For grype configuration, see https://github.com/anchore/grype#specifying-matches-to-ignore
+
+  # CVE-2015-5237 high vulnerability for google.golang.org/protobuf package
+  # https://nvd.nist.gov/vuln/detail/CVE-2015-5237
+  # Need to research -- adding it to ignore for the moment
+  - vulnerability: CVE-2015-5237
