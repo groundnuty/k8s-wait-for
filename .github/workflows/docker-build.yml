@@ -2,8 +2,10 @@ name: Docker Image Build
 
 env:
   IMAGE_NAME: pegasystems/k8s-wait-for
-  MAJOR_MINOR: "3.1"
+  MAJOR_MINOR: latest
   BUILD_NUMBER: $GITHUB_RUN_NUMBER
+  TARGET: linux/amd64
+  BUILD_FLAGS: --no-cache
 
 on:
   push:
@@ -66,6 +68,7 @@ jobs:
       - name: Log Scan Results
         if: always()
         run: |
+          docker images
           echo "Failures:"
           cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "critical" || true
           cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "high" || true
