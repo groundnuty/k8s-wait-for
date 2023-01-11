@@ -7,7 +7,7 @@ BUILD_DATE = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 BUILD_FLAGS := $(if $(BUILD_FLAGS),$(BUILD_FLAGS),--load --no-cache)
 BUILDER_NAME = k8s-wait-for-builder
 NON_ROOT_DOCKERFILE = DockerfileNonRoot
-DOCKER_TAGS = pegasystems/$(REPO_NAME):$(TAG_PREFIX)latest pegasystems/$(REPO_NAME):$(TAG_PREFIX)$(TAG)
+DOCKER_TAGS = pegasystems/$(REPO_NAME):$(TAG_PREFIX)latest pegasystems/$(REPO_NAME):$(TAG_PREFIX)$(TAG) pegasystems/$(REPO_NAME):$(TAG_PREFIX)test
 
 all: push
 

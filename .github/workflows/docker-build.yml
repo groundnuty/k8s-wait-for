@@ -48,7 +48,6 @@ jobs:
       - name: Log Scan Results
         if: always()
         run: |
-          docker images
           echo "Failures:"
           cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "critical" || true
           cat ${{ steps.scan.outputs.sarif }} | jq '.runs[0].tool.driver.rules[].shortDescription.text' | grep -i "high" || true
