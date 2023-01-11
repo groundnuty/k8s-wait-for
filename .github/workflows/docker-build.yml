@@ -29,7 +29,7 @@ jobs:
           # Need tags for Makefile logic to work
           fetch-depth: 0
 
-      - name: Build the Docker image for Trivy
+      - name: Build the Docker image
         env:
           # amd build so that local 'docker images' can access images
           TARGET: linux/amd64
