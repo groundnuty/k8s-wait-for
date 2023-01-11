@@ -52,9 +52,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build Image
-        run: make image
+        run: make image-root
 
-      - name: Scan image
+      - name: Scan image-root
         id: scan
         uses: anchore/scan-action@v3
         with:
