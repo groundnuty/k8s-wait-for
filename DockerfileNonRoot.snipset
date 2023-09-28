@@ -6,7 +6,7 @@ RUN addgroup -g $GID $USER && \
     adduser \
     --disabled-password \
     --gecos "" \
-    --home "$(pwd)" \
+    --home "/tmp" \
     --ingroup "$USER" \
     --no-create-home \
     --uid "$UID" \
