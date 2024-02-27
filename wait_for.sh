@@ -219,6 +219,12 @@ get_job_state() {
 wait_for_resource() {
     wait_for_resource_type=$1
     wait_for_resource_descriptor="$2"
+
+    if [[ -n $MY_POD_NAMESPACE && $(helm status $MY_POD_NAMESPACE -o json | jq -r '.info.status') == "deployed" ]]; then
+      echo "resource is deployed"
+      return
+    fi
+
     while [ -n "$(get_${wait_for_resource_type}_state "$wait_for_resource_descriptor")" ] ; do
         print_KUBECTL_ARGS="$KUBECTL_ARGS"
         [ "$print_KUBECTL_ARGS" != "" ] && print_KUBECTL_ARGS=" $print_KUBECTL_ARGS"
@@ -226,6 +232,7 @@ wait_for_resource() {
         echo "[$timestamp] Waiting for $wait_for_resource_type $wait_for_resource_descriptor${print_KUBECTL_ARGS}..."
         sleep "$WAIT_TIME"
     done
+
     ready "$wait_for_resource_type" "$wait_for_resource_descriptor"
 }
 
