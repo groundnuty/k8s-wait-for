@@ -1,4 +1,4 @@
-FROM alpine:3.16.2
+FROM alpine:3.20.1
 
 MAINTAINER Michal Orzechowski <orzechowski.michal@gmail.com>
 
@@ -12,9 +12,10 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.docker.dockerfile="/Dockerfile"
 
-ENV KUBE_LATEST_VERSION="v1.25.4"
+ENV KUBE_LATEST_VERSION="v1.30.2"
 
-RUN apk add --update --no-cache ca-certificates=20220614-r0 curl=7.83.1-r4 jq=1.6-r1 \
+# explicit update of libcrypto to avoid CVE-2024-5535 (until base alpine is updated)
+RUN apk add --update --no-cache ca-certificates=20240226-r0 curl=8.8.0-r0 jq=1.7.1-r0 libcrypto3=3.3.1-r1\
     && curl -L https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/$TARGETARCH/kubectl -o /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
