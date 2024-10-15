@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.20.3
 
 MAINTAINER Michal Orzechowski <orzechowski.michal@gmail.com>
 
