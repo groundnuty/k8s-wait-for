@@ -1,16 +1,18 @@
 FROM alpine:3.21.0
 
-MAINTAINER Michal Orzechowski <orzechowski.michal@gmail.com>
-
 ARG VCS_REF
 ARG BUILD_DATE
 ARG TARGETARCH
 
 # Metadata
-LABEL org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.vcs-url="https://github.com/groundnuty/k8s-wait-for" \
-      org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.docker.dockerfile="/Dockerfile"
+LABEL org.opencontainers.image.revision=$VCS_REF \
+      org.opencontainers.image.created=$BUILD_DATE \
+      org.opencontainers.image.ref.name="k8s-wait-for" \
+      org.opencontainers.image.ref.title="k8s-wait-for" \
+      org.opencontainers.image.description="Allow to wait for a k8s service, job or pods to enter a desired state" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.authors="Michal Orzechowski <orzechowski.michal@gmail.com>" \
+      org.opencontainers.image.source="https://github.com/groundnuty/k8s-wait-for"
 
 ENV KUBE_LATEST_VERSION="v1.31.4"
 
