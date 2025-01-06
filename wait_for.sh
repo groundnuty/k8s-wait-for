@@ -132,7 +132,18 @@ get_pod_state() {
 # example output with 2 services each matching a single pod would be: "falsefalse"
 get_service_state() {
     get_service_state_name="$1"
-    get_service_state_selectors=$(kubectl get service "$get_service_state_name" $KUBECTL_ARGS -ojson | jq -cr 'if . | has("items") then .items[] else . end | [ .spec.selector | to_entries[] | "\(.key)=\(.value)" ] | join(",") ' 2>&1)
+    if [ "$get_service_state_name" != "" ] ; then
+        # this guarantees that kubectl will always return .items as a top key
+        get_service_state_name=" --field-selector metadata.name=$get_service_state_name"
+    fi
+    get_service_state_selectors=$(kubectl get service $get_service_state_name $KUBECTL_ARGS -o go-template='
+{{ $first := true }}
+{{- range .items -}}
+      {{- range $key, $value := .spec.selector -}}
+        {{- if not $first}},{{else}}{{$first = false}}{{end -}}
+        {{- printf "%s=%s" $key $value -}}
+      {{- end -}}
+{{- end -}}' 2>&1)
     if [ $? -ne 0 ]; then
         echo "$get_service_state_selectors" >&2
         kill -s TERM $TOP_PID
